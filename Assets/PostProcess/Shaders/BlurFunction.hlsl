@@ -3,11 +3,6 @@
     float2 uv: TEXCOORD0;
 };
 
-struct v2f {
-    float4 vertex: POSITION;
-    float2 uv: TEXCOORD0;
-};
-
 struct v2f_GaussianBlur {
     float4 vertex: SV_POSITION;
     float2 uv[9]: TEXCOORD0;

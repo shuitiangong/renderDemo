@@ -50,7 +50,8 @@ namespace PostProcess.Runtime.Passes {
                 }
                 return;
             }
-
+            
+            if (!_blurVolume.IsEnabled.value) return;
             var cmd = CommandBufferPool.Get(_renderTag);
             Render(cmd, ref renderingData);
             context.ExecuteCommandBuffer(cmd);

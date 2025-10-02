@@ -11,6 +11,7 @@ namespace PostProcess.Runtime.Volume {
     }
     
     public class BlurVolume : VolumeComponent {
+        public BoolParameter IsEnabled = new BoolParameter(false);
         public BlurType blurType = BlurType.GaussianBlur;
         public IntParameter BlurTimes = new ClampedIntParameter(1, 0, 10);
         public FloatParameter BlurRange = new ClampedFloatParameter(1.0f, 0.0f, 10.0f);

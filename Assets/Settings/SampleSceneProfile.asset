@@ -69,6 +69,63 @@ MonoBehaviour:
   rounded:
     m_OverrideState: 0
     m_Value: 0
+--- !u!114 &-4973836592889400955
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5f6d64ecefd493c8a073cae97aced1b, type: 3}
+  m_Name: BloomVolume
+  m_EditorClassIdentifier: 
+  active: 1
+  IsEnabled:
+    m_OverrideState: 1
+    m_Value: 1
+  iterations:
+    m_OverrideState: 1
+    m_Value: 8
+  blurSpread:
+    m_OverrideState: 1
+    m_Value: 0.31
+  downSample:
+    m_OverrideState: 1
+    m_Value: 1
+  luminanceThreshold:
+    m_OverrideState: 1
+    m_Value: 1
+--- !u!114 &-357483945886416826
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12b8779411624eb98623819d09b99d49, type: 3}
+  m_Name: BlurVolume
+  m_EditorClassIdentifier: 
+  active: 1
+  IsEnabled:
+    m_OverrideState: 0
+    m_Value: 0
+  blurType: 0
+  BlurTimes:
+    m_OverrideState: 0
+    m_Value: 1
+  BlurRange:
+    m_OverrideState: 0
+    m_Value: 1
+  RTDownSampling:
+    m_OverrideState: 0
+    m_Value: 1
+  BlurAlgorithm:
+    m_OverrideState: 0
+    m_Value: 0
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -85,7 +142,8 @@ MonoBehaviour:
   - {fileID: 849379129802519247}
   - {fileID: -7893295128165547882}
   - {fileID: -7011558710299706105}
-  - {fileID: 2000063988216984916}
+  - {fileID: -4973836592889400955}
+  - {fileID: -357483945886416826}
 --- !u!114 &849379129802519247
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -102,29 +160,3 @@ MonoBehaviour:
   mode:
     m_OverrideState: 1
     m_Value: 2
---- !u!114 &2000063988216984916
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 12b8779411624eb98623819d09b99d49, type: 3}
-  m_Name: BlurVolume
-  m_EditorClassIdentifier: 
-  active: 1
-  blurType: 0
-  BlurTimes:
-    m_OverrideState: 1
-    m_Value: 4
-  BlurRange:
-    m_OverrideState: 1
-    m_Value: 0
-  RTDownSampling:
-    m_OverrideState: 1
-    m_Value: 2
-  BlurAlgorithm:
-    m_OverrideState: 1
-    m_Value: 3
