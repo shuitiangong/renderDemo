@@ -10,11 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 502b323fc05b47aa875ceb4ce73c57c1, type: 3}
-  m_Name: Blur Renderer Feature
+  m_Name: PostProcess Renderer Feature
   m_EditorClassIdentifier: 
   m_Active: 1
   settings:
-    Shader: {fileID: 4800000, guid: 31d3436e600b4fb08042069d3b010fc7, type: 3}
+    blurShader: {fileID: 4800000, guid: 31d3436e600b4fb08042069d3b010fc7, type: 3}
+    bloomShader: {fileID: 4800000, guid: 75d39618103344c182ab8b4942dd621b, type: 3}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
