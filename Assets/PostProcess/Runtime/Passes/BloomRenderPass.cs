@@ -70,15 +70,19 @@ namespace PostProcess.Runtime.Passes {
             int iterations = _bloomVolume.iterations.value;
             float blurRange = _bloomVolume.blurSpread.value;
             
+            //亮度提取
             cmd.Blit(source, GetFrontBuffer(), _bloomMaterial, 0);
+            //模糊
             for (int i = 0; i < iterations; ++i) {
                 _blurMaterial.SetFloat(_blurRange, 1.0f + i * blurRange);
                 cmd.Blit(GetFrontBuffer(), GetBackBuffer(), _blurMaterial, 0);
                 Swap();
             }
             
+            //将模糊后的图像和原图叠加在一起
             cmd.SetGlobalTexture(_blurTex, GetBackBuffer());
             cmd.Blit(source, GetFrontBuffer(), _bloomMaterial, 1);
+            //Blit回去
             cmd.Blit(GetFrontBuffer(), source);
             cmd.ReleaseTemporaryRT(_tempTargetID1);
             cmd.ReleaseTemporaryRT(_tempTargetID2);
