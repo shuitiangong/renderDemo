@@ -3,25 +3,23 @@ using PostProcess.Runtime.Volume;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
-using UnityEngine.XR;
 
 namespace PostProcess.Runtime.Passes {
     public class BloomRenderPass : ScriptableRenderPass {
         private string _renderTag = "Bloom Effects";
         private Material _bloomMaterial;
         private Material _blurMaterial;
+        private Material _postMaterial;
         private RenderTargetIdentifier _curRenderTarget;
         private RenderTextureDescriptor _curDescriptor;
         private BloomVolume _bloomVolume;
         private readonly int _luminanceThreshold = Shader.PropertyToID("_LuminanceThreshold");
         private readonly int _blurRange = Shader.PropertyToID("_BlurRange");
         private readonly int _blurTex = Shader.PropertyToID("_Bloom");
-        private bool _swap = false;
-        private readonly int _tempTargetID1 = Shader.PropertyToID("_TempBloomBuffer1");
-        private readonly int _tempTargetID2 = Shader.PropertyToID("_TempBloomBuffer2");
-        private void Swap() => _swap = !_swap;
-        private RenderTargetIdentifier GetFrontBuffer() => _swap ? _tempTargetID2 : _tempTargetID1;
-        private RenderTargetIdentifier GetBackBuffer() => _swap ? _tempTargetID1 : _tempTargetID2;
+        private readonly int _addTex = Shader.PropertyToID("_AddTex");
+        private readonly int _uberTex = Shader.PropertyToID("_UberTex");
+        private int[] _downSampleRT;
+        private int[] _upSampleRT;
         
         public BloomRenderPass(RenderPassEvent evt, Shader blurShader, Shader bloomShader) {
             renderPassEvent = evt;
@@ -31,6 +29,7 @@ namespace PostProcess.Runtime.Passes {
             }
             _bloomMaterial = CoreUtils.CreateEngineMaterial(bloomShader);
             _blurMaterial = CoreUtils.CreateEngineMaterial(blurShader);
+            _postMaterial = CoreUtils.CreateEngineMaterial("Shaders/post");
         }
         
         public void Setup(in RenderTargetIdentifier currentTarget) {
@@ -62,30 +61,59 @@ namespace PostProcess.Runtime.Passes {
         private void Render(CommandBuffer cmd, ref RenderingData renderingData) {
             RenderTargetIdentifier source = this._curRenderTarget;
             int downSample = _bloomVolume.downSample.value;
-            int tw = this._curDescriptor.width / downSample;
-            int th = this._curDescriptor.height / downSample;
-            cmd.GetTemporaryRT(_tempTargetID1, tw, th, 0, FilterMode.Bilinear, RenderTextureFormat.Default);
-            cmd.GetTemporaryRT(_tempTargetID2, tw, th, 0, FilterMode.Bilinear, RenderTextureFormat.Default);
             _bloomMaterial.SetFloat(_luminanceThreshold, _bloomVolume.luminanceThreshold.value);
             int iterations = _bloomVolume.iterations.value;
             float blurRange = _bloomVolume.blurSpread.value;
+
+            _downSampleRT = new int[iterations];
+            _upSampleRT = new int[iterations];
+            _bloomMaterial.SetFloat(_blurRange, blurRange);
             
-            //亮度提取
-            cmd.Blit(source, GetFrontBuffer(), _bloomMaterial, 0);
-            //模糊
+            int tw = this._curDescriptor.width / downSample;
+            int th = this._curDescriptor.height / downSample;
             for (int i = 0; i < iterations; ++i) {
-                _blurMaterial.SetFloat(_blurRange, 1.0f + i * blurRange);
-                cmd.Blit(GetFrontBuffer(), GetBackBuffer(), _blurMaterial, 0);
-                Swap();
+                _downSampleRT[i] = Shader.PropertyToID("_DownSample" + i);
+                _upSampleRT[i] = Shader.PropertyToID("_UpSample" + i);
+                    
+                cmd.GetTemporaryRT(_downSampleRT[i], tw, th, 0, FilterMode.Bilinear, RenderTextureFormat.ARGBFloat);
+                cmd.GetTemporaryRT(_upSampleRT[i], tw, th, 0, FilterMode.Bilinear, RenderTextureFormat.ARGBFloat);
+                tw = Mathf.Max(tw >> 1, 1);
+                th = Mathf.Max(th >> 1, 1);
             }
+            //亮度提取
+            cmd.Blit(source, _downSampleRT[0], _bloomMaterial, 6);
+            //下采样
+            for (int i = 1; i < iterations; ++i) {
+                cmd.Blit(_downSampleRT[i-1], _downSampleRT[i], _bloomMaterial, 6);
+            }
+            //上采样
+            cmd.Blit(_downSampleRT[iterations-1], _upSampleRT[iterations-2], _bloomMaterial, 6);
+            for (int i = iterations-3; i >= 0; --i) {
+                cmd.SetGlobalTexture(_addTex, _downSampleRT[i+1]);
+                cmd.Blit(_upSampleRT[i+1], _upSampleRT[i], _bloomMaterial, 7);
+            }
+            //
+            // cmd.SetGlobalTexture(_addTex,_downSampleRT[iterations-1]);
+            // cmd.Blit(_downSampleRT[iterations-2], _upSampleRT[iterations-2], _bloomMaterial, 8);
+            //
+            // for (int i = iterations-3; i >= 0; --i) {
+            //     cmd.SetGlobalTexture(_addTex, _upSampleRT[i+1]);
+            //     cmd.Blit(_downSampleRT[i], _upSampleRT[i], _bloomMaterial, 8);
+            // }
             
-            //将模糊后的图像和原图叠加在一起
-            cmd.SetGlobalTexture(_blurTex, GetBackBuffer());
-            cmd.Blit(source, GetFrontBuffer(), _bloomMaterial, 1);
+            //叠加原图
+            cmd.GetTemporaryRT(_uberTex, this._curDescriptor.width, this._curDescriptor.height, 0, FilterMode.Bilinear, RenderTextureFormat.ARGBFloat);
+            cmd.SetGlobalTexture(_blurTex, _upSampleRT[0]);
+            //_uberTex主要是为了降采样不影响原图质量
+            cmd.Blit(source, _uberTex, _bloomMaterial, 1);
             //Blit回去
-            cmd.Blit(GetFrontBuffer(), source);
-            cmd.ReleaseTemporaryRT(_tempTargetID1);
-            cmd.ReleaseTemporaryRT(_tempTargetID2);
+            cmd.Blit(_uberTex, source);
+            
+            for (int i = 0; i < iterations; ++i) {
+                cmd.ReleaseTemporaryRT(_downSampleRT[i]);
+                cmd.ReleaseTemporaryRT(_upSampleRT[i]);
+            }
+            cmd.ReleaseTemporaryRT(_uberTex);
         }
     }
 }

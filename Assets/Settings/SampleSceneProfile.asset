@@ -87,16 +87,16 @@ MonoBehaviour:
     m_Value: 1
   iterations:
     m_OverrideState: 1
-    m_Value: 8
+    m_Value: 7
   blurSpread:
     m_OverrideState: 1
-    m_Value: 0.31
+    m_Value: 1
   downSample:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 2
   luminanceThreshold:
     m_OverrideState: 1
-    m_Value: 1
+    m_Value: 1.26
 --- !u!114 &-357483945886416826
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -109,7 +109,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12b8779411624eb98623819d09b99d49, type: 3}
   m_Name: BlurVolume
   m_EditorClassIdentifier: 
-  active: 1
+  active: 0
   IsEnabled:
     m_OverrideState: 0
     m_Value: 0
@@ -156,7 +156,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 97c23e3b12dc18c42a140437e53d3951, type: 3}
   m_Name: Tonemapping
   m_EditorClassIdentifier: 
-  active: 0
+  active: 1
   mode:
     m_OverrideState: 1
     m_Value: 2

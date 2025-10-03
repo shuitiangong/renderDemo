@@ -136,7 +136,7 @@ v2f_DualBlurDown DualBlurDownVert(appdata v) {
     v2f_DualBlurDown o;
     o.vertex = TransformObjectToHClip(v.vertex.xyz);
     
-    float offset = (1 + _BlurRange) * _MainTex_TexelSize.xy * 0.5;
+    float2 offset = (1 + _BlurRange) * _MainTex_TexelSize.xy * 0.5;
     o.uv[0] = v.uv;
     o.uv[1] = v.uv + float2(-1, -1) * offset;
     o.uv[2] = v.uv + float2(1,  -1) * offset;
@@ -162,7 +162,7 @@ v2f_DualBlurUp DualBlurUpVert(appdata v) {
     v2f_DualBlurUp o;
     o.vertex = TransformObjectToHClip(v.vertex.xyz);
     
-    float offset = (1 + _BlurRange) * _MainTex_TexelSize.xy * 0.5;
+    float2 offset = (1 + _BlurRange) * _MainTex_TexelSize.xy * 0.5;
     o.uv[0] = v.uv + float2(-1, -1) * offset;
     o.uv[1] = v.uv + float2(-1,  1) * offset;
     o.uv[2] = v.uv + float2(1,  -1) * offset;
