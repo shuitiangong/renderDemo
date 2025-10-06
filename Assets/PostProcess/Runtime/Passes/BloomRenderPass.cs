@@ -29,7 +29,6 @@ namespace PostProcess.Runtime.Passes {
             }
             _bloomMaterial = CoreUtils.CreateEngineMaterial(bloomShader);
             _blurMaterial = CoreUtils.CreateEngineMaterial(blurShader);
-            _postMaterial = CoreUtils.CreateEngineMaterial("Shaders/post");
         }
         
         public void Setup(in RenderTargetIdentifier currentTarget) {
